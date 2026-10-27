@@ -1,0 +1,17 @@
+{
+ "name": "Libreta",
+ "short_name": "Libreta",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#EDF0EF",
+ "theme_color": "#2C47D4",
+ "icons": [
+  {
+   "src": "icon.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  }
+ ]
+}
