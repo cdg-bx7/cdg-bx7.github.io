@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; manifest-src 'self'; worker-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Libreta</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Libreta">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#EDF0EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1412" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="./icon.png">
+<link rel="icon" href="./icon.png">
+<link rel="manifest" href="./manifest.webmanifest">
+  <script type="module" crossorigin src="./app.js"></script>
+  <link rel="stylesheet" crossorigin href="./app.css">
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <h1 class="brand">Libreta <span id="brandSub">de gastos</span></h1>
+    <button class="iconbtn" id="btnAjustes" aria-label="Ajustes">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </header>
+
+  <nav class="secsw" role="tablist" aria-label="Apartados">
+    <button class="secbtn" role="tab" data-sec="gastos" aria-selected="true">Control de gastos</button>
+    <button class="secbtn" role="tab" data-sec="inversiones" aria-selected="false">Inversiones</button>
+  </nav>
+
+  <nav class="tabs four" id="tabsG" role="tablist" aria-label="Control de gastos">
+    <button class="tab" role="tab" id="tab-mes" aria-controls="p-mes" data-tab="mes" aria-selected="true">Mes</button>
+    <button class="tab" role="tab" id="tab-historico" aria-controls="p-historico" data-tab="historico" aria-selected="false">Histórico</button>
+    <button class="tab" role="tab" id="tab-sectores" aria-controls="p-sectores" data-tab="sectores" aria-selected="false">Sectores</button>
+    <button class="tab" role="tab" id="tab-prevision" aria-controls="p-prevision" data-tab="prevision" aria-selected="false">Previsión</button>
+  </nav>
+  <nav class="tabs four" id="tabsI" role="tablist" aria-label="Inversiones" hidden>
+    <button class="tab" role="tab" id="tab-resumen" aria-controls="p-resumen" data-tab="resumen" aria-selected="false">Resumen</button>
+    <button class="tab" role="tab" id="tab-productos" aria-controls="p-productos" data-tab="productos" aria-selected="false">Productos</button>
+    <button class="tab" role="tab" id="tab-operaciones" aria-controls="p-operaciones" data-tab="operaciones" aria-selected="false">Historial</button>
+    <button class="tab" role="tab" id="tab-iprev" aria-controls="p-iprev" data-tab="iprev" aria-selected="false">Previsión</button>
+  </nav>
+
+  <!-- MES -->
+  <section class="panel" id="p-mes" role="tabpanel" aria-labelledby="tab-mes">
+    <div class="card aviso" id="avisoCopia" hidden></div>
+    <div class="card saldo">
+      <div>
+        <div class="eyebrow">Saldo de tus cuentas</div>
+        <div class="hero" id="saldo">0,00 €</div>
+      </div>
+      <div class="acclist" id="accList"></div>
+      <div class="sub" id="saldoSub"></div>
+    </div>
+
+    <div class="card">
+      <div class="monthnav">
+        <button class="iconbtn" id="prevMes" aria-label="Mes anterior"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <span class="monthpick"><span class="monthname" id="mesNombre">—</span><input type="month" id="mesPick" aria-label="Elegir mes"></span>
+        <button class="iconbtn" id="nextMes" aria-label="Mes siguiente"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+      <div class="quad" id="quad"></div>
+      <div id="budgetBox" class="budgetbox"></div>
+      <div class="cierrebar" id="cierreBar"></div>
+    </div>
+
+    <div class="card" id="colchon"></div>
+
+    <div class="sec">
+      <h2>Movimientos <small id="nMov"></small></h2>
+      <div class="filtro" id="filtro" hidden></div>
+      <div class="days" id="days"></div>
+    </div>
+  </section>
+
+  <!-- HISTÓRICO -->
+  <section class="panel" id="p-historico" role="tabpanel" aria-labelledby="tab-historico" hidden>
+    <div class="seg" id="hPer"></div>
+    <div class="kpis" id="hKpis"></div>
+    <div class="card">
+      <div class="eyebrow">Ahorro e inversión por mes</div>
+      <div class="chart" id="hChart"></div>
+      <div class="legend-line"><span><i class="sq c-ok"></i>Ahorro</span><span><i class="sq c-inv"></i>Invertido</span><span><i class="sq c-over"></i>Mes en negativo</span></div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Mes a mes · en euros · toca un mes para verlo y editarlo</div>
+      <div class="twrap"><table class="t" id="hTabla"></table></div>
+    </div>
+    <div class="card" id="hAnual"></div>
+    <div class="card">
+      <div class="eyebrow">Año a año · en euros</div>
+      <div class="twrap"><table class="t" id="hAnios"></table></div>
+    </div>
+  </section>
+
+  <!-- SECTORES -->
+  <section class="panel" id="p-sectores" role="tabpanel" aria-labelledby="tab-sectores" hidden>
+    <div class="toggle three" id="pieTipo">
+      <button type="button" data-v="gasto" aria-pressed="true">Gastos</button>
+      <button type="button" data-v="ingreso" aria-pressed="false">Ingresos</button>
+      <button type="button" data-v="inversion" aria-pressed="false">Inversión</button>
+    </div>
+    <div class="seg" id="piePeriodo"></div>
+    <div class="card">
+      <div class="pie-wrap" id="pieWrap"></div>
+      <div class="legend" id="pieLegend"></div>
+    </div>
+  </section>
+
+  <!-- PREVISIÓN -->
+  <section class="panel" id="p-prevision" role="tabpanel" aria-labelledby="tab-prevision" hidden>
+    <div class="card">
+      <div>
+        <div class="eyebrow">Ahorro previsto en 12 meses</div>
+        <div class="hero" id="fcHero">—</div>
+      </div>
+      <div class="sub" id="fcSub"></div>
+      <div class="chart" id="fcChart"></div>
+      <div class="legend-line" id="fcLegend"><span><i></i>Saldo real de tus cuentas</span><span><i class="proj"></i>Saldo previsto</span><span id="fcBandLbl"><i class="band"></i>Rango probable</span></div>
+    </div>
+    <div class="card">
+      <div class="twrap"><table class="t narrow" id="fcTable"></table></div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">KPIs de la previsión</div>
+      <div class="kpis" id="fcKpis"></div>
+      <p class="note">Cada cifra es la media de los meses que aparecen más abajo. Escribe otra si sabes que va a cambiar, como una subida de sueldo o un préstamo que terminas. Deja el campo vacío para volver a la media.</p>
+      <b class="rotulo">Ingresos al mes</b>
+      <div class="crows" id="fcIng"></div>
+      <b class="rotulo">Gastos al mes</b>
+      <div class="crows" id="fcGas"></div>
+      <b class="rotulo">Lo que inviertes al mes</b>
+      <div class="crows"><div class="crow"><span class="n"><b><i class="dot diamond c-inv"></i><span>Inversión</span></b><small id="fcInvMedia"></small></span><input id="fcInv" inputmode="decimal" autocomplete="off" aria-label="Inversión prevista al mes"></div></div>
+      <div class="two eq">
+        <div class="field"><label for="fcSubI">Subida ingresos %/año</label><input id="fcSubI" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+        <div class="field"><label for="fcSubG">Subida gastos %/año</label><input id="fcSubG" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+      </div>
+      <p class="fc-note" id="fcBase"></p>
+      <div><button type="button" class="linkbtn" id="fcReset">Volver a la media histórica</button></div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Meses con apuntes que se han tenido en cuenta</div>
+      <div class="seg" id="fcPer"></div>
+      <div class="twrap"><table class="t narrow fcmeses" id="fcMeses"></table></div>
+      <p class="note">Desmarca los meses atípicos, como uno con paga extra o una avería grande, para que no tuerzan la media.</p>
+    </div>
+  </section>
+
+  <!-- INVERSIONES: RESUMEN -->
+  <section class="panel" id="p-resumen" role="tabpanel" aria-labelledby="tab-resumen" hidden>
+    <div class="card saldo">
+      <div>
+        <div class="eyebrow">Patrimonio neto</div>
+        <div class="hero" id="patHero">0,00 €</div>
+      </div>
+      <div class="sub" id="patSub"></div>
+    </div>
+    <div id="invBody" class="panel"></div>
+  </section>
+
+  <!-- INVERSIONES: PRODUCTOS -->
+  <section class="panel" id="p-productos" role="tabpanel" aria-labelledby="tab-productos" hidden>
+    <div class="sec">
+      <h2>Tus productos <small id="nProd"></small></h2>
+      <div class="prods" id="prodList"></div>
+      <div><button type="button" class="btn small" data-act="addprod">Añadir producto</button></div>
+      <p class="note" id="precioNota"></p>
+    </div>
+  </section>
+
+  <!-- INVERSIONES: PREVISIÓN -->
+  <section class="panel" id="p-iprev" role="tabpanel" aria-labelledby="tab-iprev" hidden>
+    <div class="card">
+      <div>
+        <div class="eyebrow">Inversiones previstas en 12 meses</div>
+        <div class="hero" id="ipHero">—</div>
+      </div>
+      <div class="sub" id="ipSub"></div>
+      <div class="chart" id="ipChart"></div>
+      <div class="legend-line"><span><i class="sq c-inv"></i>Fondos, ETF, acciones y otros</span><span><i class="sq c3"></i>Inmuebles</span><span><i class="sq c-muted tenue"></i>Zona clara: previsto</span></div>
+    </div>
+    <div class="card">
+      <div class="twrap"><table class="t narrow" id="ipTabla"></table></div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Supuestos de la previsión</div>
+      <b class="rotulo">Fondos, ETF, acciones y otros</b>
+      <div id="ipRent" class="panel g8"></div>
+      <div class="two eq">
+        <div class="field"><label for="ipAA">Aportas / mes</label><input id="ipAA" inputmode="decimal" autocomplete="off"></div>
+        <div class="field"><label for="ipRA">Rentabilidad %/año</label><input id="ipRA" inputmode="decimal" autocomplete="off"></div>
+      </div>
+      <b class="rotulo">Inmuebles</b>
+      <div class="assump">
+        <div class="field"><label for="ipAI">Pagas / mes</label><input id="ipAI" inputmode="decimal" autocomplete="off"></div>
+        <div class="field"><label for="ipMI">Nº de meses</label><input id="ipMI" inputmode="numeric" autocomplete="off"></div>
+        <div class="field"><label for="ipRI">Sube %/año</label><input id="ipRI" inputmode="decimal" autocomplete="off"></div>
+      </div>
+      <p class="fc-note" id="ipBase"></p>
+      <div><button type="button" class="linkbtn" id="ipReset">Volver a los valores de tu historial</button></div>
+    </div>
+  </section>
+
+  <!-- INVERSIONES: OPERACIONES -->
+  <section class="panel" id="p-operaciones" role="tabpanel" aria-labelledby="tab-operaciones" hidden>
+    <div class="card" id="realizadas"></div>
+    <div class="sec">
+      <h2>Operaciones <small id="nOps"></small></h2>
+      <div class="days" id="opList"></div>
+    </div>
+  </section>
+
+  <p class="status" id="status">Abriendo la libreta…</p>
+</main>
+
+<div class="bar-bottom">
+  <button class="addbtn" id="btnAdd"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span id="btnAddLbl">Apuntar</span></button>
+</div>
+
+<!-- hoja: movimiento -->
+<dialog class="scrim" id="sheetMov" aria-labelledby="tMov">
+  <form class="sheet" id="formMov" aria-labelledby="tMov" novalidate>
+    <div class="grip"></div>
+    <h3 id="tMov">Nuevo movimiento</h3>
+    <div class="toggle five" id="fTipo">
+      <button type="button" data-v="gasto" aria-pressed="true">Gasto</button>
+      <button type="button" data-v="ingreso" aria-pressed="false">Ingreso</button>
+      <button type="button" data-v="aportacion" aria-pressed="false">Inversión</button>
+      <button type="button" data-v="devolucion" aria-pressed="false">Me devuelven</button>
+      <button type="button" data-v="traspaso" aria-pressed="false">Traspaso</button>
+    </div>
+    <div class="amountbox" id="fBox">
+      <input id="fImporte" inputmode="decimal" autocomplete="off" placeholder="0,00" aria-label="Importe">
+      <span class="cur" id="fCur">€</span>
+    </div>
+    <div class="field" id="fRefWrap" hidden>
+      <label for="fRef">¿Qué gasto te devuelven?</label>
+      <select id="fRef"></select>
+    </div>
+    <p class="note" id="fRefInfo" hidden></p>
+    <div class="field" id="fCatWrap">
+      <label for="fCat" id="fCatLbl">Concepto</label>
+      <select id="fCat"></select>
+    </div>
+    <div class="field" id="fNewWrap" hidden>
+      <label for="fNew">Nombre del concepto nuevo</label>
+      <input id="fNew" maxlength="40" autocomplete="off" placeholder="Ej. Gimnasio">
+    </div>
+    <div class="two eq">
+      <div class="field"><label for="fCuenta" id="fCuentaLbl">Pagado desde</label><select id="fCuenta"></select></div>
+      <div class="field" id="fDestWrap" hidden><label for="fDest">Hacia</label><select id="fDest"></select></div>
+    </div>
+    <div class="wipebox inv" id="fInvNote" hidden><p class="note">Este movimiento no tiene producto: cuenta como inversión del mes, pero la app no sabe cuánto rinde.</p><div class="actions"><button type="button" class="btn small" id="fAOp">Pasar a Inversiones con producto</button></div></div>
+    <div class="two">
+      <div class="field"><label for="fNota">Nota</label><input id="fNota" maxlength="80" placeholder="Opcional" autocomplete="off"></div>
+      <div class="field"><label for="fFecha">Fecha</label><input id="fFecha" type="date"></div>
+    </div>
+    <p class="note" id="fCerrado" hidden></p>
+    <div class="actions" id="fDevRow" hidden>
+      <button type="button" class="btn" id="fDevolver">Me han devuelto parte (Bizum)</button>
+    </div>
+    <p class="err" id="fErr" role="alert"></p>
+    <div class="actions">
+      <button type="button" class="btn danger" id="fDel" hidden>Eliminar</button>
+      <button type="button" class="btn" id="fCancel">Cancelar</button>
+      <button type="submit" class="btn primary" id="fSave">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- hoja: cierre de mes -->
+<dialog class="scrim" id="sheetCierre" aria-labelledby="tCierre">
+  <form class="sheet" id="formCierre" aria-labelledby="tCierre" novalidate>
+    <div class="grip"></div>
+    <h3 id="tCierre">Cierre del mes</h3>
+    <p class="note">Escribe el total del mes de cada concepto, como en tu Numbers. Los gastos van en positivo. En los tickets, positivo es lo que te cargan y negativo lo que gastas. Lo que ya apuntaste suelto cuenta dentro del total.</p>
+    <div class="crows" id="cRows"></div>
+    <div class="csum" id="cSum"></div>
+    <h4>Saldos reales a fin de mes</h4>
+    <p class="note">Copia el saldo que te da cada banco a fin de mes. Si no coincide con la app, falta algo por apuntar.</p>
+    <div class="crows" id="cSaldos"></div>
+    <p class="note" id="cDiffNote"></p>
+    <label class="check"><input type="checkbox" id="cCuadrar" checked> <span>Registrar las diferencias como ajustes de saldo, para que la app cuadre con el banco</span></label>
+    <p class="err" id="cErr" role="alert"></p>
+    <div class="actions">
+      <button type="button" class="btn" id="cCancel">Cancelar</button>
+      <button type="submit" class="btn primary" id="cSave">Guardar cierre</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- hoja: ajustes -->
+<dialog class="scrim" id="sheetAjustes" aria-labelledby="tAj">
+  <form class="sheet" id="formAjustes" aria-labelledby="tAj" novalidate>
+    <div class="grip"></div>
+    <h3 id="tAj">Ajustes</h3>
+    <div class="two eq">
+      <div class="field"><label for="aIng">Lo que ganas al mes</label><input id="aIng" inputmode="decimal" placeholder="Ej. 1.800" autocomplete="off"></div>
+      <div class="field"><label for="aPres">Límite de gasto al mes</label><input id="aPres" inputmode="decimal" placeholder="Ej. 1.300" autocomplete="off"></div>
+    </div>
+    <div class="field"><label for="aMon">Moneda</label>
+      <select id="aMon">
+        <option value="EUR">Euro (€)</option><option value="USD">Dólar (US$)</option><option value="GBP">Libra (£)</option>
+        <option value="MXN">Peso mexicano</option><option value="ARS">Peso argentino</option><option value="COP">Peso colombiano</option>
+        <option value="CLP">Peso chileno</option><option value="PEN">Sol peruano</option>
+      </select>
+    </div>
+
+    <h4>Cuentas</h4>
+    <p class="note">El saldo inicial es lo que tenía cada cuenta antes del primer movimiento que apuntes o importes. Si no lo sabes, deja 0 y cuadra el último mes en el cierre.</p>
+    <div class="catlist" id="aCuentas"></div>
+    <div class="addcat"><input id="aNewCuenta" maxlength="30" placeholder="Nueva cuenta" aria-label="Nueva cuenta"><button type="button" data-addcuenta="1">Añadir</button></div>
+    <div class="field"><label for="aPrincipal">Cuenta de los movimientos sin cuenta</label><select id="aPrincipal"></select></div>
+
+    <h4>Conceptos de gasto</h4>
+    <p class="note">Cada concepto lleva la cuenta en la que suele ir. Es la que se usa en el cierre de mes.</p>
+    <div class="catlist" id="aCatsGasto"></div>
+    <div class="addcat"><input id="aNewGasto" maxlength="40" placeholder="Nuevo concepto de gasto" aria-label="Nuevo concepto de gasto"><button type="button" data-add="gasto">Añadir</button></div>
+    <h4>Conceptos de ingreso</h4>
+    <div class="catlist" id="aCatsIngreso"></div>
+    <div class="addcat"><input id="aNewIngreso" maxlength="40" placeholder="Nuevo concepto de ingreso" aria-label="Nuevo concepto de ingreso"><button type="button" data-add="ingreso">Añadir</button></div>
+    <h4>Conceptos de inversión</h4>
+    <div class="catlist" id="aCatsInversion"></div>
+    <div class="addcat"><input id="aNewInversion" maxlength="40" placeholder="Nuevo concepto de inversión" aria-label="Nuevo concepto de inversión"><button type="button" data-add="inversion">Añadir</button></div>
+    <p class="note">Si quitas un concepto o una cuenta, deja de salir en los desplegables; lo ya apuntado lo conserva.</p>
+
+    <h4>Protección</h4>
+    <p class="note" id="aProt"></p>
+    <div class="actions" id="aProtRow"></div>
+
+    <h4>Importar tu histórico</h4>
+    <p class="note">Exporta tu Numbers a Excel o CSV: una fila por concepto y una columna por mes, como en tu plantilla. Cada mes importado se guarda como su cierre; si importas el mismo mes otra vez, se sustituye.</p>
+    <div class="actions">
+      <button type="button" class="btn" id="aImportBtn">Importar desde Numbers</button>
+      <input type="file" id="aImport" accept=".xlsx,.csv,text/csv" hidden>
+    </div>
+    <p class="note" id="aImportMsg" hidden></p>
+    <div class="actions" id="aImportRow" hidden>
+      <button type="button" class="btn" id="aImportNo">Cancelar</button>
+      <button type="button" class="btn primary" id="aImportYes">Importar</button>
+    </div>
+
+    <h4>Cambiar de móvil</h4>
+    <ol class="pasos" id="aGuiaMovil">
+      <li>En el móvil antiguo: «Copia de seguridad» (abajo, en Tus datos), con una contraseña que recuerdes. Guárdala en iCloud Drive o pásala a tu ordenador.</li>
+      <li>En el nuevo: abre <b id="aUrl"></b> en Safari, toca Compartir → «Añadir a pantalla de inicio» y entra siempre desde ese icono.</li>
+      <li>Crea la contraseña de la app.</li>
+      <li>Si dudas de qué copia es, Ajustes → «Comprobar una copia»: enseña su fecha, sus cifras y sus cuentas y conceptos sin restaurar nada.</li>
+      <li>Ajustes → «Restaurar una copia», elige el archivo y escribe su contraseña. La app comprueba que movimientos, saldos, inversiones y los nombres de cuentas y conceptos coinciden con la copia.</li>
+      <li>Activa Face ID en Ajustes → Protección.</li>
+      <li>Cuando todo cuadre, haz una copia nueva desde el móvil nuevo y borra la libreta del antiguo («Borrar todos mis datos»).</li>
+    </ol>
+
+    <h4>Versión de la app</h4>
+    <p class="note" id="aVersion"></p>
+    <div class="actions" id="aVersionRow" hidden><button type="button" class="btn primary" id="aActualizar">Actualizar</button></div>
+    <div class="actions"><button type="button" class="btn" id="aMedir">Medir la velocidad</button></div>
+    <p class="note" id="aMedirRes" role="status" hidden></p>
+
+    <h4>Tus datos</h4>
+    <p class="note" id="aStore"></p>
+    <p class="note" id="aEspacio" role="status"></p>
+    <div class="actions" id="aExportRow" hidden>
+      <button type="button" class="btn" id="aBackup">Copia de seguridad</button>
+      <button type="button" class="btn" id="aExport">Exportar a CSV</button>
+    </div>
+    <p class="note warn" id="aExportAviso" role="status" hidden>El CSV sale <b>sin cifrar</b>: cualquiera que tenga el archivo podrá leer tus movimientos. Para guardar tus datos usa «Copia de seguridad». Toca otra vez «Exportar a CSV» si aun así lo quieres.</p>
+    <div class="actions">
+      <button type="button" class="btn" id="aRestoreBtn">Restaurar una copia</button>
+      <button type="button" class="btn" id="aComprobarBtn">Comprobar una copia</button>
+      <input type="file" id="aRestore" accept=".json,application/json" hidden>
+    </div>
+    <p class="note" id="aRestoreMsg" hidden></p>
+    <div class="note copiadet" id="aCopiaDet" hidden></div>
+    <div class="field" id="aRestorePassWrap" hidden><label for="aRestorePass">Contraseña de la copia</label><div class="addcat"><input type="password" id="aRestorePass" autocomplete="current-password" aria-label="Contraseña de la copia"><button type="button" id="aRestoreOpen">Abrir copia</button></div></div>
+    <label class="check" id="aRestoreAjWrap" hidden><input type="checkbox" id="aRestoreAj"> <span>Sustituir también mis ajustes (lo que ganas, el límite, la moneda, los planes de cada mes y las previsiones) por los de la copia</span></label>
+    <div class="actions" id="aRestoreRow" hidden>
+      <button type="button" class="btn" id="aRestoreNo">Cancelar</button>
+      <button type="button" class="btn primary" id="aRestoreYes">Añadir a mi libreta</button>
+    </div>
+    <h4>Empezar de cero</h4>
+    <div class="actions" id="aWipeRow"><button type="button" class="btn danger" id="aWipe">Borrar todos mis datos</button></div>
+    <div class="wipebox" id="aWipeBox" hidden>
+      <p><b>¿Seguro que quieres borrarlo todo?</b></p>
+      <p class="note" id="aWipeTxt"></p>
+      <div class="actions">
+        <button type="button" class="btn" id="aWipeNo">No, cancelar</button>
+        <button type="button" class="btn danger armed" id="aWipeYes">Sí, borrar todo</button>
+      </div>
+    </div>
+    <p class="err" id="aErr" role="alert"></p>
+    <div class="actions">
+      <button type="button" class="btn" id="aCancel">Cerrar</button>
+      <button type="submit" class="btn primary">Guardar ajustes</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- hoja: plan de un mes -->
+<dialog class="scrim" id="sheetPlan" aria-labelledby="tPlan">
+  <form class="sheet" id="formPlan" aria-labelledby="tPlan" novalidate>
+    <div class="grip"></div>
+    <h3 id="tPlan">Plan del mes</h3>
+    <p class="note">Cambia lo que esperas cobrar y tu límite solo para este mes. Los demás meses siguen con tus valores de siempre.</p>
+    <div class="two eq">
+      <div class="field"><label for="pIng">Esperas cobrar</label><input id="pIng" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+      <div class="field"><label for="pPres">Límite de gasto</label><input id="pPres" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+    </div>
+    <p class="note" id="pDef"></p>
+    <p class="err" id="pErr" role="alert"></p>
+    <div class="actions">
+      <button type="button" class="btn" id="pReset" hidden>Volver al de siempre</button>
+      <button type="button" class="btn" id="pCancel">Cancelar</button>
+      <button type="submit" class="btn primary">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- hoja: producto -->
+<dialog class="scrim" id="sheetProd" aria-labelledby="tProd">
+  <form class="sheet" id="formProd" aria-labelledby="tProd" novalidate>
+    <div class="grip"></div>
+    <h3 id="tProd">Nuevo producto</h3>
+    <div class="field"><label for="prNombre">Nombre</label><input id="prNombre" maxlength="60" autocomplete="off" placeholder="Ej. Vanguard Global Stock Index"></div>
+    <div class="field"><label for="prTipo">Tipo</label>
+      <select id="prTipo"><option value="fondo">Fondo indexado</option><option value="etf">ETF</option><option value="accion">Acción</option><option value="inmueble">Inmueble</option><option value="otro">Otro</option></select>
+    </div>
+    <p class="note" id="prTipoNote"></p>
+    <div id="prDetalle" class="panel g14"></div>
+    <p class="err" id="prErr" role="alert"></p>
+    <div class="actions">
+      <button type="button" class="btn danger" id="prDel" hidden>Eliminar</button>
+      <button type="button" class="btn" id="prCancel">Cerrar</button>
+      <button type="submit" class="btn primary">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- hoja: operación -->
+<dialog class="scrim" id="sheetOp" aria-labelledby="tOp">
+  <form class="sheet" id="formOp" aria-labelledby="tOp" novalidate>
+    <div class="grip"></div>
+    <h3 id="tOp">Nueva operación</h3>
+    <div class="toggle three clases" id="oClase">
+      <button type="button" data-v="bolsa" aria-pressed="true">Fondos, ETF, acciones</button>
+      <button type="button" data-v="inmueble" aria-pressed="false">Inmueble</button>
+      <button type="button" data-v="otro" aria-pressed="false">Otro</button>
+    </div>
+    <div class="toggle four" id="oTipo">
+      <button type="button" data-v="compra" aria-pressed="true">Compra</button>
+      <button type="button" data-v="venta" aria-pressed="false">Venta</button>
+      <button type="button" data-v="aportacion" aria-pressed="false">Aportación</button>
+      <button type="button" data-v="retirada" aria-pressed="false">Retirada</button>
+      <button type="button" data-v="dividendo" aria-pressed="false">Dividendo</button>
+    </div>
+    <div class="field"><label for="oProd" id="oProdLbl">Producto</label><select id="oProd"></select></div>
+    <button type="button" class="btn small solo-inicio" id="oNuevoProd" hidden>Crear producto</button>
+    <div class="field" id="oConceptoWrap" hidden><label for="oConcepto">¿Qué estás pagando?</label><select id="oConcepto"></select></div>
+    <div class="two eq">
+      <div class="field" id="oImpWrap"><label for="oImp" id="oImpLbl">Importe</label><input id="oImp" inputmode="decimal" autocomplete="off" placeholder="0,00"></div>
+      <div class="field" id="oUnidWrap"><label for="oUnid">Participaciones</label><input id="oUnid" inputmode="decimal" autocomplete="off" placeholder="Ej. 12,3456"></div>
+      <div class="field" id="oComWrap"><label for="oCom">Comisión (incluida)</label><input id="oCom" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+      <div class="field"><label for="oFecha">Fecha</label><input id="oFecha" type="date"></div>
+    </div>
+    <p class="note" id="oTotal"></p>
+    <div class="field"><label for="oCuenta" id="oCuentaLbl">Sale de</label><select id="oCuenta"></select></div>
+    <p class="note" id="oCuentaNote"></p>
+    <div class="field"><label for="oNota">Nota</label><input id="oNota" maxlength="80" placeholder="Opcional" autocomplete="off"></div>
+    <p class="note" id="oCerrado" hidden></p>
+    <p class="err" id="oErr" role="alert"></p>
+    <div class="actions">
+      <button type="button" class="btn danger" id="oDel" hidden>Eliminar</button>
+      <button type="button" class="btn" id="oCancel">Cancelar</button>
+      <button type="submit" class="btn primary" id="oSave">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- hoja: copia de seguridad -->
+<dialog class="scrim" id="sheetCopia" aria-labelledby="tCopia">
+  <form class="sheet" id="formCopia" aria-labelledby="tCopia" novalidate>
+    <div class="grip"></div>
+    <h3 id="tCopia">Copia de seguridad</h3>
+    <p class="note">Protege la copia con una contraseña. Sin ella nadie puede abrirla, tampoco tú: si la olvidas, la copia no sirve. La app no guarda la contraseña en ningún sitio.</p>
+    <div id="kPaso1" class="panel g12">
+      <p class="note">Puede ser la misma que la de la app o otra distinta: la copia se cifra aparte, con su propia sal, y no depende de la llave de este iPhone.</p>
+      <div class="field"><label for="kPass">Contraseña (12 caracteres o 4 palabras como mínimo)</label><input type="password" id="kPass" autocomplete="new-password" aria-describedby="kFuerza"></div>
+      <div class="fuerza" id="kFuerza" aria-live="polite"><span class="barra"><i></i></span><span class="fz-texto"></span></div>
+      <div class="field"><label for="kPass2">Repite la contraseña</label><input type="password" id="kPass2" autocomplete="new-password"></div>
+      <p class="err" id="kErr" role="alert"></p>
+      <div class="actions"><button type="submit" class="btn primary" id="kCifrar">Cifrar copia</button></div>
+    </div>
+    <div id="kPaso2" class="panel g12" hidden>
+      <p class="note" id="kListo"></p>
+      <div class="actions"><button type="button" class="btn" id="kCancel">Cancelar</button><button type="button" class="btn primary" id="kGuardar">Guardar en Archivos</button></div>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="aviso" id="otraPestana" aria-labelledby="otraPestanaT" aria-describedby="otraPestanaD"><h2 id="otraPestanaT">La libreta ha cambiado en otra pestaña</h2><p class="note" id="otraPestanaD">Se han guardado cambios desde otra pestaña o ventana. Para no pisarlos, esta se ha bloqueado y ya no guarda nada. Recárgala para seguir con los datos al día.</p><button type="button" class="btn primary" id="otraPestanaBtn">Recargar</button></dialog>
+<div class="lock" id="lock" hidden><div class="lockbox"><img src="./icon.png" class="lockico" alt=""><div id="lockBody" class="panel g14"></div></div></div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+</body>
+</html>
